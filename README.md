@@ -32,7 +32,7 @@ The data is stored as CSV, and the metadata is
 stored as a well-structured header. The header can be composed of an arbitrary number 
 of sections, and each section stores text or an arbitrary number of keys and values.
 The tools provided here allow to write and load data and metadata stored in this
-format easily. Specifically, the metadata in the header can be conviniently handled
+format easily. Specifically, the metadata in the header can be conveniently handled
 using dictionary-like interfaces.
 
 For further information and examples, see the documentation within the file.
@@ -44,7 +44,7 @@ large amounts of data files simply and efficiently. At the same time,
 it seeks to work out of the box on most systems. This module achieves those goals 
 by implementing a set of functions that leverage the capabilities of a so-called file index.
 The file index is a table that relates the paths to many data files with some attributes 
-characteristic of each file. The tools in this module help create file indeces 
+characteristic of each file. The tools in this module help create file indices 
 based on user-defined attributes loader functions, which define how attributes are to be extracted
  from the data files. Moreover, tools are provided for locating data files with queries based on 
 attributes and to easily launch parallel analyses of the data files using user-defined
