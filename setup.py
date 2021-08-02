@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.3",
     author="David Fernández Castellanos",
     author_email="castellanos@gmx.com",
-    description="A minimalist suite for managing numerical data stored in plain text files",
+    description="A minimalist suite for managing plain text files storing numerical data",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kastellane/ADMiniSter",
