@@ -12,8 +12,8 @@
     -------
     This module aims to provide tools to manage, locate, and process
     large amounts of data files simply and efficiently. At the same time,
-    it seeks to work out of the box on most systems, for which it is top of standard
-    Python modules such as pandas and NumPy.
+    it seeks to work out of the box on most systems. To this end, it is built on
+    top of standard Python modules such as pandas and NumPy.
     
     Specifically, this module achieves those goals by implementing a set of 
     functions that leverage the capabilities of a so-called file index. The file 

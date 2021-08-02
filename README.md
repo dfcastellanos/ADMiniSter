@@ -26,14 +26,12 @@ into an application.
 
 This module defines a format to store data and metadata in plain text files, and
 provides the tools to create and read the data and the metadata easily.
-The format specified here is meant to be self-descriptive and straightforward enough for
-most common situations. To this end, the data is stored as CSV, and the metadata is 
-stored as a header. The header can be composed of an arbitrary number of sections, 
-and each section stores text or an arbitrary number of keys and values.
-The tools provided here allow us to write and load data stored in this format easily.
-The CSV data is handled using pandas built-in tools. The metadata in the header
-is manipulated using dictionary-like interfaces, thanks to the functions implemented
-next.
+The data is stored as CSV, and the metadata is 
+stored as a well-structured header. The header can be composed of an arbitrary number 
+of sections, and each section stores text or an arbitrary number of keys and values.
+The tools provided here allow to write and load data and metadata stored in this
+format easily. Specifically, the metadata in the header can be conviniently handled
+using dictionary-like interfaces.
 
 For further information and examples, see the documentation within the file.
 
@@ -41,24 +39,19 @@ For further information and examples, see the documentation within the file.
 
 This module aims to provide tools to manage, locate, and process
 large amounts of data files simply and efficiently. At the same time,
-it seeks to work out of the box on most systems, for which it is top of standard
-Python modules such as pandas and NumPy.
+it seeks to work out of the box on most systems. This module achieves those goals 
+by implementing a set of functions that leverage the capabilities of a so-called file index.
+The file index is a table that relates the paths to many data files with some attributes 
+characteristic of each file. The tools in this module help create file indeces 
+based on user-defined attributes loader functions, which define how attributes are to be extracted
+ from the data files. Moreover, tools are provided for locating data files with queries based on 
+attributes and to easily launch parallel analyses of the data files using user-defined
+functions.
 
-Specifically, this module achieves those goals by implementing a set of 
-functions that leverage the capabilities of a so-called file index. The file 
-index is a table that relates the file paths with some attributes characteristic of
-each file. Each row contains a filename column, which is the table's primary key,
-and defines the location of the data file within the file system. The rest of
-the columns correspond to the data file attributes, which depend on the context 
-and are for the user to define (see next section). Since the file index contains
-paths to the data files but not the data itself, the file index is typically lightweight and fast.
-Thus, the file index is saved and re-loaded as a plain-text CSV file, and a
-pandas DataFrame is used to manage it.
+Since the file index contains paths to the data files but not the data itself, the file index is 
+typically lightweight and fast, and can in many situations efficiently replace more
+complex, heavier data management systems.
 
-When a file index has been created, we can leverage it. Thus, with the tools
-provided next, we can efficiently locate data files with queries based on their attributes using
-the locate function. We can call the apply or
-the group_and_apply functions to launch parallel analyses on the located data files.
 
 For further information and examples, see the documentation within the file.
 
@@ -83,7 +76,7 @@ python setup.py install
 
 Alternatively, instead of installing it, you can add the files that you need to your project's
 directory and directly import them as modules. The source files are located in 
-`ADMiniSter_root/src/ADMiniSter/`.  Also, you can add that
+`ADMiniSter_root/src/ADMiniSter/`. Also, you can add that
 directory to your [Python path](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH)
 to make all the modules available
 
