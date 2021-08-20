@@ -60,15 +60,27 @@ For further information and examples, see the documentation within the file.
 
 ## Installation
 
-ADMiniSter requires `Python >= 3.4`. It depends on the packages `numpy`, `pandas`,
- `joblib` and`progressbar2`. You can install them doing
+### Automatic installation
+ADMiniSter requires `Python >= 3.4`. If your current Python environment satisfy this
+condition, you can install all the dependencies and the ADMiniSter package doing
+
+```sh
+make install
+```
+
+Note: the installation requires `pip`. If `pip` is not installed, see [these 
+instructions](https://pip.pypa.io/en/stable/installation/) on how to install it.
+
+### Manual installation
+Alternatively, if some problem arises during the automatic installation or you desire
+more control, you can resort to a manual installation.
+
+ADMiniSter depends on the packages `numpy`, `pandas`, `joblib` and`progressbar2`. 
+You can install them doing
 
 ```sh
 pip install numpy pandas joblib progressbar2
 ```
-
-If pip is not installed in your system, see [these instructions](https://pip.pypa.io/en/stable/installation/)
-on how to install it.
 
 Once the dependencies are met, go to the ADMiniSter directory and do
 
@@ -80,7 +92,19 @@ Alternatively, instead of installing it, you can add the files that you need to 
 directory and directly import them as modules. The source files are located in 
 `ADMiniSter_root/src/ADMiniSter/`. Also, you can add that
 directory to your [Python path](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH)
-to make all the modules available
+to make all the modules available.
+
+
+## Testing
+
+For testing, the packages `pytest` and `pytest-cov` are required. If you used the
+automatic installation, they should already be installed. Otherwise, you must
+install them manually. Once ADMiniSter is installed in your working Python environment,
+you can run the tests doing
+
+```sh
+make test
+```
 
 ## Documentation
 The ADMiniSter source files are fully documented and contain examples of use.

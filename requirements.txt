@@ -1,0 +1,8 @@
+pylint
+pytest
+pytest-cov
+black
+numpy
+pandas
+joblib
+progressbar2
