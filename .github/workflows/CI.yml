@@ -1,4 +1,4 @@
-name: DevelopCI
+name: Python 3.8
 on:
   push:
     branches:
