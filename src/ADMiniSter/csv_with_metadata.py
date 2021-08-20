@@ -9,17 +9,16 @@
     4.0 International Public License.
     
     Summary
-    -------
-    
-    Long-term storage of numerical data requires context to make sense of the data. 
-    Adding metadata to the files can partially solve this problem by making the 
-    files self-descriptive. While common data formats such as HDF5, JSON, XML, etc. 
-    provide standard ways to include metadata, plain text files with numerical data, 
-    such as the CSV format, do not. Thus, different applications
-    or users resort to their own ways to include metadata as a header, making this
-    metadata format non-universal and potentially laborious to be parsed and loaded 
+    -------    
+    Long-term storage of numerical data requires context to make sense of that data. 
+    Adding metadata to the files can partially solve this problem by making the files 
+    self-descriptive. While common plain-text data formats such as JSON and XML can 
+    handle metadata in a natural way, the CSV format, which is specially convenient 
+    for numerical data storage, does not. Thus, different applications or users resort
+    to their own ways to include metadata in CSV files as a header, making this 
+    metadata format non-universal and potentially laborious to be parsed and loaded
     into an application.
-    
+
     This module defines a format to store data and metadata in plain text files, and
     provides the tools to create and read the data and the metadata easily.
     The format specified here is meant to be self-descriptive and straightforward enough for

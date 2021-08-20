@@ -19,13 +19,13 @@ All these reasons make plain text data storage a very attractive solution whenev
 
 ### csv_with_metadata.py
 
-Long-term storage of numerical data requires context to make sense of the data. 
-Adding metadata to the files can partially solve this problem by making the 
-files self-descriptive. While common data formats such as HDF5, JSON, XML, etc. 
-provide standard ways to include metadata, plain text files with numerical data, 
-such as the CSV format, do not. Thus, different applications
-or users resort to their own ways to include metadata as a header, making this
-metadata format non-universal and potentially laborious to be parsed and loaded 
+Long-term storage of numerical data requires context to make sense of that data. 
+Adding metadata to the files can partially solve this problem by making the files 
+self-descriptive. While common plain-text data formats such as JSON and XML can 
+handle metadata in a natural way, the CSV format, which is specially convenient 
+for numerical data storage, does not. Thus, different applications or users resort
+to their own ways to include metadata in CSV files as a header, making this 
+metadata format non-universal and potentially laborious to be parsed and loaded
 into an application.
 
 This module defines a format to store data and metadata in plain text files, and
