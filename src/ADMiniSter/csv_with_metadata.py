@@ -239,7 +239,7 @@ def write(df, filename, metadata=None, float_format="%.5f"):
 
     """
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="ascii") as file:
         if metadata is not None:
             metadata["dtype"] = {k: str(v) for k, v in df.dtypes.items()}
             header_str = construct_header(metadata)
@@ -270,7 +270,7 @@ def parse_header(filename):
 
     header = dict()
 
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="ascii") as file:
 
         file_str = file.read().split("\n")
         hearder_lines = list()
