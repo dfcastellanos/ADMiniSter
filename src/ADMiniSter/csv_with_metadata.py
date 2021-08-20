@@ -138,15 +138,14 @@
 """
 
 import pandas as pd
-import numpy as np
 from ast import literal_eval
 
 
 def header_line_to_dict(hearder_line):
     """
-    
+
     Parse a line of a text file header into a dictionary.
-    
+
     Parameters
     ----------
     - hearder_line: a line of the header
@@ -154,22 +153,24 @@ def header_line_to_dict(hearder_line):
     Returns
     -------
     A dictionary witih the data stored in the header line.
-    
+
     For more informaiton, see format description at the top.
-            
+
     """
 
-    hearder_line = hearder_line.split(',')
-    hearder_line = filter(lambda x: x != '', hearder_line)
+    hearder_line = hearder_line.split(",")
+    hearder_line = filter(lambda x: x != "", hearder_line)
 
     attrs = {}
     for S in hearder_line:
-        a = S.strip(' ').split('=')
+        a = S.strip(" ").split("=")
         key = a[0]
         value_str = a[1]
         try:
             attrs[key] = literal_eval(value_str)
-        except:
+        except ValueError:
+            # in this case, the string does not represent a number, so we
+            # keep it as is
             attrs[key] = value_str
 
     return attrs
@@ -177,10 +178,10 @@ def header_line_to_dict(hearder_line):
 
 def construct_header(metadata):
     """
-    
-    Construct a text file header in string format. 
+
+    Construct a text file header in string format.
     For more informaiton, see format description at the top.
-    
+
     Parameters
     ----------
     - metadata: dictionary-like object witih the metadata
@@ -188,73 +189,73 @@ def construct_header(metadata):
     Returns
     -------
     A string with the metadata, ready to be used as header of a text file.
-            
+
     """
 
-    header_str = ''
+    header_str = ""
 
     for name, value in metadata.items():
 
-        if name == 'filename':
+        if name == "filename":
             continue
 
-        header_str += '# {}:'.format(name)
+        header_str += "# {}:".format(name)
 
         if type(value) == dict:
             for (k, v) in value.items():
-                k = k.replace(' ', '_')
+                k = k.replace(" ", "_")
                 if type(v) == str:
-                    v = v.replace(' ', '_')
-            value_str = ['{}={}'.format(k, v) for k, v in value.items()]
-            value_str = (',' + ' ').join(value_str)
-            header_str += ' {}\n'.format(value_str)
+                    v = v.replace(" ", "_")
+            value_str = ["{}={}".format(k, v) for k, v in value.items()]
+            value_str = ("," + " ").join(value_str)
+            header_str += " {}\n".format(value_str)
 
         else:
-            header_str += ' {}\n'.format(value)
+            header_str += " {}\n".format(value)
 
-    return header_str.strip('\n')
+    return header_str.strip("\n")
 
 
 def write(df, filename, metadata=None, float_format="%.5f"):
     """
-    
+
     Write the input pandas DataFrame into a CSV file, with a header created from
     the input metadata.
-    
+
     Parameters
     ----------
     - df: the pandas DataFrame
     - filename: the file to be written
-    - metadata: the metadata, to be written as a header. It is a dictionary, where each 
+    - metadata: the metadata, to be written as a header. It is a dictionary, where each
                 key corresponds to a section of the header. Each value is a string, a number,
-                or another dictionary. If it is another dictionary, it will be written as a 
+                or another dictionary. If it is another dictionary, it will be written as a
                 header line with format key1=value1, key2=value2, ...
                 (for more informaiton, see format description at the top)
     - float_format: specifies the format with which the float data is written
-    
-    
+
+
     Example
     -------
     See documentation at the top
-              
+
     """
 
-    with open(filename, 'w') as file:
+    with open(filename, "w") as file:
         if metadata is not None:
-            metadata['dtype'] = {k: str(v) for k, v in df.dtypes.items()}
+            metadata["dtype"] = {k: str(v) for k, v in df.dtypes.items()}
             header_str = construct_header(metadata)
-            file.write(header_str + '\n')
+            file.write(header_str + "\n")
 
-        df.to_csv(file, index=False, sep=',', float_format=float_format)
+        df.to_csv(file, index=False, sep=",", float_format=float_format)
 
     return
 
 
 def parse_header(filename):
     """
-    
+
     Parse the header of a text file.
-    
+
     Parameters
     ----------
     - filename: the file to read
@@ -263,26 +264,26 @@ def parse_header(filename):
     -------
     A dictionary, where each key corresponds to a line of the header. Each value is
     another dictionary with the data of that line.
-    
+
     For more informaiton, see format description at the top.
-            
+
     """
 
     header = dict()
 
-    with open(filename, 'r') as file:
+    with open(filename, "r") as file:
 
-        file_str = file.read().split('\n')
+        file_str = file.read().split("\n")
         hearder_lines = list()
 
         for line in file_str:
-            if line.startswith('#'):
-                hearder_lines.append(line.strip('# '))
+            if line.startswith("#"):
+                hearder_lines.append(line.strip("# "))
 
         for line in hearder_lines:
-            name = line.split(':')[0].strip(' ')
-            value = line.split(':')[1].strip(' ')
-            if '=' in value:
+            name = line.split(":")[0].strip(" ")
+            value = line.split(":")[1].strip(" ")
+            if "=" in value:
                 value = header_line_to_dict(value)
             header[name] = value
 
@@ -291,11 +292,11 @@ def parse_header(filename):
 
 def load(filename):
     """
-    
+
     Load a text file with metadata as header and data in CSV format.
     This function allows to load files created with write().
     For more informaiton, see format description at the top.
-    
+
     Parameters
     ----------
     - filename: the file to load
@@ -303,55 +304,27 @@ def load(filename):
     Returns
     -------
     - df: a pandas DataFrame with the CSV data
-    - metadata: a dictionary whose keys correspond to each line of metadata 
+    - metadata: a dictionary whose keys correspond to each line of metadata
                 composing the header.
-                
+
     Example
     -------
     See documentation at the top
-            
+
     """
 
     metadata = parse_header(filename)
-    metadata['filename'] = filename
+    metadata["filename"] = filename
 
-    if 'dtype' in metadata:
-        dtype = metadata['dtype']
+    if "dtype" in metadata:
+        dtype = metadata["dtype"]
     else:
         dtype = None
 
     try:
-        df = pd.read_csv(filename, comment='#', engine='c', dtype=dtype)
-    except Exception as ex:
-        print('Problem reading: {}'.format(filename))
+        df = pd.read_csv(filename, comment="#", engine="c", dtype=dtype)
+    except FileNotFoundError:
+        print("Problem reading: {}".format(filename))
         raise
 
     return df, metadata
-
-
-def test():
-    # create sample data
-    A = 1.
-    sigma = 0.5
-
-    N = 365
-    t = np.arange(N)
-    x = A * np.sin(t * 2 * 3.1415 / N) + np.random.normal(0., sigma, N)
-
-    df_input = pd.DataFrame({'time_step': t, 'value': x})
-
-    metadata_input = dict(description='this is the description',
-                          name='this is the name',
-                          params={'A': A, 'sigma': sigma}
-                          )
-
-    # write the data to a file and load it back
-    write(df_input, '/tmp/test.csv', metadata=metadata_input)
-    df, metadata = load('/tmp/test.csv')
-
-    test_results = {}
-    test_results['df == df_input'] = all(df == df_input)
-    test_results['df.dtypes == df_input.dtypes'] = all(df.dtypes == df_input.dtypes)
-    test_results['metadata == metadata_input'] = all([metadata[k] == metadata_input[k] for k in metadata_input.keys()])
-
-    return test_results

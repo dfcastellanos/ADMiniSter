@@ -161,25 +161,18 @@
     
 """
 
-# implementation of the core
 import pandas as pd
 import numpy as np
-
-# for parallel apply and group_and_apply
-import multiprocessing
 from joblib import Parallel, delayed
 from progressbar import progressbar
-
-# for testing purposes
 import os
-import ADMiniSter.csv_with_metadata as csv
 
 
 def load(index_filename):
     """
-    
+
     Load an existing file index from a CSV file.
-    
+
     Parameters
     ----------
     - index_filename: the path to the file.
@@ -187,65 +180,71 @@ def load(index_filename):
     Returns
     -------
     A pandas DataFrame with the file index.
-            
+
     """
 
-    return pd.read_csv(index_filename, engine='c')
+    return pd.read_csv(index_filename, engine="c")
 
 
 def write(df, index_filename):
     """
-    
+
     Write a file index contained in a pandas DataFrame to a text CSV file.
-    
+
     Parameters
     ----------
     - df: the DataFrame with the file index.
     - index_filename: the path to the file.
-            
+
     """
 
     df.to_csv(index_filename, index=False)
-    print('-> {} successfully written'.format(index_filename))
+    print("-> {} successfully written".format(index_filename))
     return
 
 
 def build(files, attrs_loader):
     """
-    
+
     Build a new file index.
-    
+
     Parameters
     ----------
     - files: the list of files to be indexed.
     - attrs_loader: a user-defined function that returns the attributes of a data file. The
                     attributes loader function must take as input the path to a datafile
                     and return a dictionary relating the names of the attributes (as keys)
-                    to their respective values.                    
+                    to their respective values. It is the responsibility of the attrs_loader
+                    function to handle exceptions when reading the files. In the case that
+                    no attributes are loaded, None must be returned.
 
     Returns
     -------
     The file index as a pandas DataFrame.
-    
+
     """
 
-    print('-> Reading {} files...'.format(len(files)))
-    if len(files) == 0: print('--> Nothing to do')
+    print("-> Reading {} files...".format(len(files)))
+    if len(files) == 0:
+        print("--> Nothing to do")
 
     new_data = list()
     problems = list()
     for filename in progressbar(files):
-        try:
-            attrs = attrs_loader(filename)
-            attrs['filename'] = filename
-        except Exception as e:
-            print('--> Exception with ' + filename + ': \n', e)
+        attrs = attrs_loader(filename)
+        if attrs is not None:
+            attrs["filename"] = filename
+            new_data.append(attrs)
+        else:
             problems.append(filename)
-            continue
 
-        new_data.append(attrs)
+    if len(problems) > 0:
+        print("-> Problems reading {} files".format(len(problems)))
+        for f in problems:
+            print("-->", f)
 
-    print('--> Problems reading {} files'.format(len(problems)))
+    if len(new_data) == 0:
+        raise Exception("No file was read")
 
     df = pd.DataFrame(new_data)
 
@@ -256,85 +255,87 @@ def build(files, attrs_loader):
 
 def update(df, files, attrs_loader):
     """
-    
+
     updates an existing file index. If some files defined in the index are
     missing in the input file list, those missing files are removed from the
     index. If some input files are new, they are added to the index.
-    
+
     Parameters
     ----------
     - df: a DataFrame with the existing file index.
     - files: the updated list of files.
     - attrs_loader: a user-defined function that returns the attributes of a data file. The
-                attributes loader function must take as input the path to a data file
-                and return a dictionary relating the names of the attributes (as keys)
-                to their respective values.  
+                    attributes loader function must take as input the path to a data file
+                    and return a dictionary relating the names of the attributes (as keys)
+                    to their respective values. It is the responsibility of the attrs_loader
+                    function to handle exceptions when reading the files. In the case that
+                    no attributes are loaded, None must be returned.
 
     Returns
     -------
     The updated file index as a pandas DataFrame.
-            
+
     """
 
-    print('-> Updating file index')
+    print("-> Updating file index")
 
-    # remove missing files    
+    # remove missing files
     n0 = len(df)
-    w = df['filename'].apply(os.path.isfile)  # still exisiting files
+    w = df["filename"].apply(os.path.isfile)  # still exisiting files
     n1 = sum(w)
     if n0 != n1:
-        print('--> Missing files:')
-        print(df['filename'][np.logical_not(w)])
+        print("--> Missing files:")
+        print(df["filename"][np.logical_not(w)])
     df = df[w]
-    print('--> {} files have been cleaned from the index'.format(n0 - n1))
+    print("--> {} files have been cleaned from the index".format(n0 - n1))
 
     # add new files
-    new_files = set(files) - set(df['filename'].values)
+    new_files = set(files) - set(df["filename"].values)
     df_new = build(new_files, attrs_loader)
     df = pd.concat([df, df_new])
 
-    print('--> {} new files have been added to the index'.format(len(new_files)))
+    print("--> {} new files have been added to the index".format(len(new_files)))
 
     return df
 
 
 def locate(df, attrs, drop=False):
     """
-    
+
     Locate all the files with the desired attribute values in the given file index.
-    
+
     Parameters
     ----------
     - df: a DataFrame with the file index.
-    - attrs: a dictionary relating the names of the attributes (as keys) to their respective values. 
+    - attrs: a dictionary relating the names of the attributes (as keys) to their respective values.
              This dictionary of attributes does not need to contain all the possible attributes,
              but a subset of them. Thus, if a file index has attributes A, B and C, it is allowed
              to query for attrs = dict(A=5.0, B=3.), which will locate all the data files that simultaneously fulfill
              that A=5. and B=3., irrespective of the value of C.
-    - drop: if drop, the returned DataFrame won't contain the columns associated with the 
+    - drop: if drop, the returned DataFrame won't contain the columns associated with the
             input attributes (in the example above, it won't have columns A and B, but it
                               will have C).
 
     Returns
     -------
     A subset of the file index containing the paths to all those data files whose attributes
-    match the desired values. Note: this subset is another file index to which 
+    match the desired values. Note: this subset is another file index to which
     all the functions of this module are applicable.
-            
+
     """
 
     # since we will perform modifications during the process, we work on a copy
-    # (what is normally big is the data to which the index points, but not the index 
+    # (what is normally big is the data to which the index points, but not the index
     # itself, so this should be ok)
     df = df.copy()
 
-    # if the values are float64, Pandas has problems to find values in the 
+    # if the values are float64, Pandas has problems to find values in the
     # dataframe using == operator
     for c in df.columns:
-        if df[c].dtype == 'float64':
-            df[c] = df[c].astype('float32')
+        if df[c].dtype == "float64":
+            df[c] = df[c].astype("float32")
 
-    # list of boolean lists           
+    # list of boolean lists
     locs = [df[k] == v for k, v in attrs.items()]
 
     # stack into matrix, then keep only columns where all values are true
@@ -348,8 +349,8 @@ def locate(df, attrs, drop=False):
     if isinstance(df, pd.DataFrame):
         return df
     elif isinstance(df, pd.Series):
-        out.name = None
-        return out.to_frame().T
+        df.name = None
+        return df.to_frame().T
     else:
         raise TypeError
 
@@ -357,14 +358,14 @@ def locate(df, attrs, drop=False):
 def apply(df, target_func, n_cpus=None):
     """
 
-    Apply row-wise a user-defined target function to the file index. Each row 
+    Apply row-wise a user-defined target function to the file index. Each row
     is passed as input to the function. The call for each row is done in parallel.
-        
+
     Parameters
     ----------
     - df: a DataFrame with the file index.
-    - target_func: a user-defined function to be applied, which takes as input a 
-                   row from the file index. A typical target function loads 
+    - target_func: a user-defined function to be applied, which takes as input a
+                   row from the file index. A typical target function loads
                    the file and analyses its data. Then, it adds the results
                    as new columns of the input row.
     - n_cpus: the number of CPUs for the parallel analysis. If none, the default
@@ -376,29 +377,31 @@ def apply(df, target_func, n_cpus=None):
     target function returned when called on each file index row. If n_cpus > 1,
     the function is applied in parallel, in which case the order of the list is
     in general different from the file index.
-            
+
     """
 
-    return Parallel(n_cpus)(delayed(target_func)(row) for i, row in progressbar(df.iterrows()))
+    return Parallel(n_cpus)(
+        delayed(target_func)(row) for i, row in progressbar(df.iterrows())
+    )
 
 
 def group_and_apply(df, target_func, by, n_cpus=None):
     """
 
-    Group the file index and then apply group-wise a user-defined target function. 
+    Group the file index and then apply group-wise a user-defined target function.
     The call for each group is done in parallel.
-        
+
     Parameters
     ----------
     - df: a DataFrame with the file index.
-    - target_func: a user-defined function to be applied, which takes two arguments. 
-                  The first is a tuple with the grouping values. The second is the 
+    - target_func: a user-defined function to be applied, which takes two arguments.
+                  The first is a tuple with the grouping values. The second is the
                   group's DataFrame. A typical target function loads the data files
                   of the group, analyses their data, and returns the
                   results from the analysis and the grouping values.
-    - by: used to determine the groups. It allows us to define groups 
-          of data files that share some characteristic and whose data must be 
-          processed simultaneously by the target function. See pandas.DataFrame.groupby.           
+    - by: used to determine the groups. It allows us to define groups
+          of data files that share some characteristic and whose data must be
+          processed simultaneously by the target function. See pandas.DataFrame.groupby.
     - n_cpus: the number of CPUs for the parallel analysis. If none, the default
              number of CPUs defined by the system will be used.
 
@@ -406,103 +409,10 @@ def group_and_apply(df, target_func, by, n_cpus=None):
     -------
     A list with the results. Each entry of the list contains whatever the
     target function returned when called on each group.
-            
+
     """
 
     grouped_df = df.groupby(by)
-    return Parallel(n_cpus)(delayed(target_func)(key, group) for key, group in progressbar(grouped_df))
-
-
-def make_test_files(A_list, sigma_list):
-    N = 365
-    t = np.arange(N)
-    filenames = list()
-    A_ = list()
-    sigma_ = list()
-
-    for A in A_list:
-        for sigma in sigma_list:
-            A = np.round(A, 2)
-            sigma = np.round(sigma, 2)
-
-            x = A * np.sin(t * 2 * 3.1415 / N) + np.random.normal(0., sigma, N)
-
-            df = pd.DataFrame({'time_step': t, 'value': x})
-
-            filename = 'test_file_index+A_{}+sigma_{}.csv'.format(A, sigma)
-
-            metadata = dict(filename=filename,
-                            description='this is the description',
-                            params={'A': A, 'sigma': sigma}
-                            )
-
-            csv.write(df, filename, metadata)
-
-            filenames.append(filename)
-            A_.append(A)
-            sigma_.append(sigma)
-
-    return filenames, A_, sigma_
-
-
-def test():
-    os.chdir('/tmp')
-
-    # create files to test the file index
-    filenames, A_list, sigma_list = make_test_files([1, 2, 3, 4, 5], [0.1, 0.2, 0.3, 0.4])
-
-    metadata_loader = lambda filename: csv.parse_header(filename)['params']
-    original_df = build(filenames, metadata_loader)
-
-    # create the file index, write it to a file and load it back
-    write(original_df, 'index.csv')
-    df = load('index.csv')
-
-    test_results = {}
-    test_results['len(reloaded_df.index)==len(filenames)'] = len(df.index) == len(filenames)
-
-    r = list()
-    for i, row in df.iterrows():
-        r.append(row['filename'] == filenames[i] and \
-                 row['A'] == A_list[i] and \
-                 row['sigma'] == sigma_list[i])
-    test_results['all(row of reloaded_df == (filename,A,sigma))'] = all(r)
-
-    test_results['reloaded_df == original_df'] = all(df == original_df)
-    test_results['reloaded_df.dtypes == original_df.dtypes'] = all(df.dtypes == original_df.dtypes)
-    test_results['reloaded_df.columns == original_df.columns'] = all(df.columns == original_df.columns)
-
-    dropped_filenames = [f for f in filenames if 'A_5' in f]
-    for f in dropped_filenames:
-        os.system('rm -f ' + f)
-
-    updated_filenames = set(filenames) - set(dropped_filenames)
-    new_filenames, _, _ = make_test_files([6, 7, 8], [0.1, 0.2, 0.3])
-    updated_filenames.update(new_filenames)
-    updated_df = update(df, updated_filenames, metadata_loader)
-
-    test_results['len(updated_df)==len(updated_filenames)'] = len(updated_df.index) == len(updated_filenames)
-    test_results['updated_df.filename==np.array(updated_filenames)'] = set(
-        updated_df.filename.values) == updated_filenames
-
-    subset_df = locate(df, dict(A=1.))
-    subset_df_ = df[df['A'] == 1.]
-    test_results['locate(df,attrs)==df[ where(attrs) ]'] = all(subset_df == subset_df_)
-
-    # n_cpus = 1#multiprocessing.cpu_count()
-
-    # # process row-wise
-    # target_func = lambda row: print(row['filename'])
-    # apply(df, target_func, n_cpus)
-
-    # # process row-wise (only a subset)
-    # sub_df = locate(df, dict(A=7.))
-    # results = apply(sub_df, target_func, n_cpus)
-
-    # # group and process group-wise
-    # target_func = lambda key, group: print(group)
-    # results = group_and_apply(df, target_func, df['A'], n_cpus)
-
-    # print(results)
-
-    return test_results
+    return Parallel(n_cpus)(
+        delayed(target_func)(key, group) for key, group in progressbar(grouped_df)
+    )
