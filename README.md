@@ -1,3 +1,5 @@
+[![Python 3.8](https://github.com/kastellane/ADMiniSter/actions/workflows/CI.yml/badge.svg)](https://github.com/kastellane/ADMiniSter/actions/workflows/CI.yml)
+
 # ADMiniSter
 
 ADMinister stems from "Ascii Data Minimalist management Suite." Its goal is to provide
