@@ -70,8 +70,11 @@ condition, you can install all the dependencies and the ADMiniSter package doing
 make install
 ```
 
-Note: the installation requires `pip`. If `pip` is not installed, see [these 
-instructions](https://pip.pypa.io/en/stable/installation/) on how to install it.
+Note: the installation requires `pip` and `setuptools`. They are likely to be
+already installed. Nonetheless, if `pip` is not installed, you can follow 
+[these](https://pip.pypa.io/en/stable/installation/) instructions to install it.
+If `setuptools` is missing, you can install it doing `pip install setuptools` once
+`pip` has been installed.
 
 ### Manual installation
 Alternatively, if some problem arises during the automatic installation or you desire
