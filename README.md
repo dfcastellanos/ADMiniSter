@@ -65,7 +65,7 @@ For further information and examples, see the documentation within the file.
 ## Installation
 
 ### Automatic installation
-ADMiniSter requires `Python >= 3.4`. If your current Python environment satisfy this
+ADMiniSter requires `Python >= 3.4`. If your current Python environment satisfies this
 condition, you can install all the dependencies and the ADMiniSter package doing
 
 ```sh
@@ -127,10 +127,10 @@ requests and ideas for the project.
 ADMiniSter is open source. You can freely use it, redistribute it, and/or modify it
 under the terms of the Creative Commons Attribution 4.0 International Public 
 License. The full text of the license can be found in the file LICENSE at the 
-top level of the MEPLS distribution.
+top level of the ADMiniSter distribution.
  
 Copyright (C) 2021  - David Fernández Castellanos.
 
 
-   [author's website]: <https://www.davidfcastellanos.com/contact>
+   [author's website]: <https://www.davidfcastellanos.com/>
    
