@@ -132,5 +132,5 @@ top level of the ADMiniSter distribution.
 Copyright (C) 2021  - David Fernández Castellanos.
 
 
-   [author's website]: <https://www.davidfcastellanos.com/>
+   [author's website]: <https://www.dfcastellanos.com/>
    
