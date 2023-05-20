@@ -13,7 +13,7 @@ using plain text files for numerical data storage presents many advantages. Name
 it is human-friendly, readable by most applications out of the box, and since the data is encoded 
 into characters instead of in binary form, it is system-independent. For the latter 
 reason, their compatibility with future applications or machines is also guaranteed (which is of the utmost
-importance for e.g., scientific research, where some findings might become specially relevant in decades). 
+importance for e.g., scientific research, where some findings might become specially relevant even in decades after). 
 All these reasons make plain text data storage a very attractive solution whenever performance allows it. 
 
 
