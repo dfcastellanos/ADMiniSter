@@ -7,12 +7,13 @@
 ADMinister stems from "Ascii Data Minimalist management Suite." Its goal is to provide
 a collection of simple yet powerful tools to manage plain text files storing numerical data.
 Despite their drawbacks regarding reading speed or information density, plain text files remain 
-the most widely available form of numerical data storage. The reason behind that is not only 
-historical. Whenever performance or storage capabilities are not a concern, 
+the most widely available form of numerical data storage in many fields such as academic research.
+The reason behind that is not only historical. Whenever performance or storage capabilities are not a concern, 
 using plain text files for numerical data storage presents many advantages. Namely,
 it is human-friendly, readable by most applications out of the box, and since the data is encoded 
-into characters instead of in binary form, it is system-independent. For this latter 
-reason, their compatibility with future applications or machines is also guaranteed. 
+into characters instead of in binary form, it is system-independent. For the latter 
+reason, their compatibility with future applications or machines is also guaranteed (which is of the utmost
+importance for e.g., scientific research, where some findings might become specially relevant in decades). 
 All these reasons make plain text data storage a very attractive solution whenever performance allows it. 
 
 
